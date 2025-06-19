@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, BarChart, BarChart2, PieChart, HelpCircle } from 'lucide-react';
+import { Home, BarChart2, PieChart, AreaChart, ChartBarStacked, ChartCandlestick, ChartColumnStacked, ChartGantt, ChartLine, ChartNetwork } from 'lucide-react';
 
 const Layout = ({ children }) => {
   const navigate = useNavigate();
@@ -44,41 +44,38 @@ const Layout = ({ children }) => {
             </NavLink>
 
             <NavLink path="/static_question">
-              <PieChart size={20} />
+              <AreaChart size={20} />
               <span>Static question</span>
             </NavLink>
 
-            {/* SDK embedding */}
-            <NavLink path="/sdk_interactive_dashboard">
-              <BarChart size={20} />
-              <span>SDK Interactive Dashboard</span>
-            </NavLink>
-
             <NavLink path="/sdk_static_dashboard">
-              <BarChart size={20} />
+              <ChartBarStacked size={20} />
               <span>SDK Static Dashboard</span>
             </NavLink>
-            
-            <NavLink path="/sdk_interactive_question">
-              <BarChart size={20} />
-              <span>SDK interactive question</span>
+
+            <NavLink path="/sdk_interactive_dashboard">
+              <ChartCandlestick size={20} />
+              <span>SDK Interactive Dashboard</span>
             </NavLink>
             
             <NavLink path="/sdk_static_question">
-              <BarChart size={20} />
+              <ChartColumnStacked size={20} />
               <span>SDK static question</span>
             </NavLink>
+
+            <NavLink path="/sdk_interactive_question">
+              <ChartGantt size={20} />
+              <span>SDK interactive question</span>
+            </NavLink>
             
-            <NavLink path="/sdk_query_builder">
-              <BarChart size={20} />
-              <span>SDK query builder</span>
+            <NavLink path="/interactive_question_builder">
+              <ChartLine size={20} />
+              <span>Interactive question builder</span>
             </NavLink>
 
-
-            {/* Interactive embedding + New question */}
-            <NavLink path="/interactive_question_builder">
-              <HelpCircle size={20} />
-              <span>Interactive question builder</span>
+            <NavLink path="/sdk_query_builder">
+              <ChartNetwork size={20} />
+              <span>SDK query builder</span>
             </NavLink>
           </div>
         </div>

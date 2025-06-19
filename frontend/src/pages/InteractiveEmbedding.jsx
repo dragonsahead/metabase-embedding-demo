@@ -8,7 +8,7 @@ const Interactive = () => {
         <a href="https://www.metabase.com/docs/latest/embedding/interactive-embedding#showing-or-hiding-metabase-ui-components" target="_blank" rel="noopener noreferrer" style={{ color: 'blue', textDecoration: 'underline' }}>here</a>.
       </p>
       <iframe 
-        src="http://localhost:9090/api/auth?return_to=http://localhost:3000/dashboard/1"
+        src="http://localhost:9090/api/auth?return_to=http://localhost:3000/dashboard/1?side_nav=true&top_nav=true"
         className="w-full h-[calc(100vh-12rem)] rounded-lg"
         title="Analytics Dashboard"
       />

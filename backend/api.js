@@ -7,27 +7,6 @@ const JWT_SIGNING_KEY_INTERACTIVE_EMBEDDING = process.env.JWT_SIGNING_KEY_INTERA
 const JWT_SIGNING_KEY_STATIC_EMBEDDING = process.env.JWT_SIGNING_KEY_STATIC_EMBEDDING;
 const METABASE_URL = process.env.METABASE_URL;
 
-// this is the user that will be used to SSO and signed with the interactive embedding signing key for interactive embedding
-const user = {
-    email: "someone@somedomain.com",
-    first_name: "Someone",
-    last_name: "Somebody",
-    exp: Math.floor(Date.now() / 1000) + 60 * 60, // this is the expiration time for the token, in this case, it's 1 hour
-    groups: ["viewer"], // groups property is optional, we're sending this to show how you can configure group mappings in Metabase
-}
-
-// this is where we sign the user token with the interactive embedding signing key
-const signUserToken = user =>
-    jwt.sign(
-      {
-        email: user.email,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        exp: user.exp,
-      },
-      JWT_SIGNING_KEY_INTERACTIVE_EMBEDDING
-    );
-
 // this is where we sign the static embedded dashboard or question with the static embedding signing key. We're using the id as the resource, and an empty object as the params, but the params object can be used to pass fixed filter values to the dashboard
 const signStaticEmbeddedResource = (resource, resource_id) => {
     const resourceObj = { [resource]: resource_id };
@@ -64,27 +43,51 @@ const server = Bun.serve({
                     })
                     , 301);
             case '/api/auth': // this is the endpoint that the frontend will call to get the SSO URL
-                return Response.redirect(
-                    url.format({
-                        pathname: `${METABASE_URL}/auth/sso`,
-                        query: {
-                            jwt: signUserToken(user),
-                            return_to: params.get('return_to'),
-                            // you can also include more parameters to customize the features you want to expose: https://www.metabase.com/docs/latest/embedding/interactive-embedding#showing-or-hiding-metabase-ui-components
-                        },
-                    }),
-                    301);
-            case '/api/sdk': // this is the endpoint that the frontend will call to get the session token with the SDK, it could have been done in the previous endpoint, but it's just here separated for clarity
-                let token = await fetch(`http://metabase:3000/auth/sso?token=true&jwt=${signUserToken(user)}`); // check that we're using the Metabase container URL here instead of localhost, since the API call here is server to server to get the session token rather than a pure FE call like it's on the interactive embedding SSO endpoint
-                token = await token.json();
-                return Response.json(token, 
-                    { 
-                        headers: {
-                            'Access-Control-Allow-Origin': 'http://localhost:8080',
-                            'Access-Control-Allow-Credentials': 'true',
-                            'Access-Control-Allow-Methods': 'GET'
-                        } 
-                    });
+                const isSdkRequest = params.get('response') === 'json';
+
+                const user = {
+                    email: "someone@somedomain.com",
+                    first_name: "Someone",
+                    last_name: "Somebody",
+                    exp: Math.floor(Date.now() / 1000) + 60 * 60, // this is the expiration time for the token, in this case, it's 1 hour
+                    groups: ["viewer"], // groups property is optional, we're sending this to show how you can configure group mappings in Metabase
+                };
+
+                const token = jwt.sign(
+                    {
+                        email: user.email,
+                        first_name: user.first_name,
+                        last_name: user.last_name,
+                        exp: user.exp,
+                        groups: user.groups,
+                    },
+                    JWT_SIGNING_KEY_INTERACTIVE_EMBEDDING
+                );
+
+                if (isSdkRequest) {
+                    // if the request is coming from the SDK, we return the token directly
+                    return Response.json({ jwt: token },
+                        {
+                            headers: {
+                                'Access-Control-Allow-Origin': 'http://localhost:8080',
+                                'Access-Control-Allow-Credentials': 'true',
+                                'Access-Control-Allow-Methods': 'GET'
+                            }
+                        });
+                } else {
+                    // if the request is not coming from the SDK, we redirect to the Metabase SSO URL with the token
+                    // the return_to parameter is optional, but it's useful to redirect the user back to the frontend after the SSO login
+                    return Response.redirect(
+                        url.format({
+                            pathname: `${METABASE_URL}/auth/sso`,
+                            query: {
+                                jwt: token,
+                                return_to: params.get('return_to'),
+                                // you can also include more parameters to customize the features you want to expose: https://www.metabase.com/docs/latest/embedding/interactive-embedding#showing-or-hiding-metabase-ui-components
+                            },
+                        }),
+                        301);
+                }
             default:
                 return new Response(null, { status: 404 });
         }

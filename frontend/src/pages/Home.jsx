@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, BarChart2, PieChart, HelpCircle } from 'lucide-react';
+import { ArrowRight, BarChart2, PieChart, AreaChart, ChartBarStacked, ChartCandlestick, ChartColumnStacked, ChartGantt, ChartLine, ChartNetwork } from 'lucide-react';
 
 const Home = () => {
   return (
@@ -22,49 +22,49 @@ const Home = () => {
         />
         <FeatureCard 
           icon={<PieChart className="w-8 h-8 text-green-500" />}
-          title="Static embedding"
+          title="Static Dashboard"
           description="This is an example of a Metabase dashboard being embedded without any interactivity (only filters)."
           link="/static_dashboard"
         />
         <FeatureCard 
-          icon={<PieChart className="w-8 h-8 text-green-500" />}
-          title="Static embedding"
+          icon={<AreaChart className="w-8 h-8 text-green-500" />}
+          title="Static Question"
           description="This is an example of a Metabase Question being embedded without any interactivity (only filters)."
           link="/static_question"
         />
         <FeatureCard 
-          icon={<HelpCircle className="w-8 h-8 text-red-500" />}
-          title="SDK"
+          icon={<ChartBarStacked className="w-8 h-8 text-red-500" />}
+          title="SDK Static Dashboard"
           description="This is the same dashboard, but embedded using the SDK."
           link="/sdk_static_dashboard"
         />
         <FeatureCard 
-          icon={<HelpCircle className="w-8 h-8 text-red-500" />}
-          title="SDK"
+          icon={<ChartCandlestick className="w-8 h-8 text-red-500" />}
+          title="SDK Interactive Dashboard"
           description="This is the same dashboard, but embedded using the SDK."
           link="/sdk_interactive_dashboard"
         />
         <FeatureCard 
-          icon={<HelpCircle className="w-8 h-8 text-red-500" />}
-          title="SDK"
+          icon={<ChartColumnStacked className="w-8 h-8 text-red-500" />}
+          title="SDK Static Question"
           description="This is the same question, but embedded using the SDK."
           link="/sdk_static_question"
         />
         <FeatureCard 
-          icon={<HelpCircle className="w-8 h-8 text-red-500" />}
-          title="SDK"
+          icon={<ChartGantt className="w-8 h-8 text-red-500" />}
+          title="SDK Interactive Question"
           description="This is the same question, but embedded using the SDK."
           link="/sdk_interactive_question"
         />
         <FeatureCard 
-          icon={<HelpCircle className="w-8 h-8 text-purple-500" />}
+          icon={<ChartLine className="w-8 h-8 text-purple-500" />}
           title="Interactive question builder"
           description="This is an example of Metabase being embedded interactively but controlling where the user can go. In this case, the GUI question builder."
           link="/interactive_question"
         />
         <FeatureCard 
-          icon={<HelpCircle className="w-8 h-8 text-purple-500" />}
-          title="SDK query builder"
+          icon={<ChartNetwork className="w-8 h-8 text-purple-500" />}
+          title="SDK Question Builder"
           description="This is an example of Metabase being embedded interactively but controlling where the user can go. In this case, the GUI question builder."
           link="/sdk_query_builder"
         />

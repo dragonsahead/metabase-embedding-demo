@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@metabase/embedding-sdk-react": "^0.52.8",
+    "@metabase/embedding-sdk-react": "^0.55.3",
     "autoprefixer": "^10.4.20",
     "lucide-react": "^0.471.1",
     "postcss": "^8.5.1",

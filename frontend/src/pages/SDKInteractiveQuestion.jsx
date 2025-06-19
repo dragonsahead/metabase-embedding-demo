@@ -5,10 +5,9 @@ import {
     defineMetabaseAuthConfig,
     defineMetabaseTheme,
 } from "@metabase/embedding-sdk-react";
-  
+
 const config = defineMetabaseAuthConfig({
     metabaseInstanceUrl: import.meta.env.VITE_METABASE_INSTANCE_URL,
-    authProviderUri: import.meta.env.VITE_AUTH_PROVIDER_URI,
 });
 
 const theme = defineMetabaseTheme({

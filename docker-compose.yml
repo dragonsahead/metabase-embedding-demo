@@ -1,6 +1,6 @@
 services:
   metabase:
-    image: metabase/metabase-enterprise:v1.52.8
+    image: metabase/metabase-enterprise:v1.55.4
     container_name: metabase
     hostname: metabase
     ports:
@@ -10,12 +10,20 @@ services:
       MB_ENABLE_EMBEDDING: true
       MB_EMBEDDING_SECRET_KEY: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
       MB_SITE_URL: http://localhost:3000/
-      MB_PREMIUM_EMBEDDING_TOKEN: <your token>
+      MB_PREMIUM_EMBEDDING_TOKEN: <your-token>
       MB_LOAD_ANALYTICS_CONTENT: false
       MB_LOAD_SAMPLE_CONTENT: false
       MB_JWT_ENABLED: true
-      MB_JWT_IDENTITY_PROVIDER_URI: http://backend:8080/api/auth
+      MB_JWT_IDENTITY_PROVIDER_URI: http://localhost:9090/api/auth # this is the endpoint that the backend will use to authenticate users
       MB_JWT_SHARED_SECRET: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+      MB_JWT_GROUP_SYNC: true
+      MB_JWT_GROUP_MAPPINGS: '{"viewer":[3]}'
+      MB_DB_TYPE: postgres
+      MB_DB_HOST: app-db
+      MB_DB_PORT: 5432
+      MB_DB_USER: metabase
+      MB_DB_PASS: mysecretpassword
+      MB_DB_NAME: metabase
     deploy:
       resources:
         limits:
@@ -34,6 +42,32 @@ services:
     depends_on:
       postgres-data1:
         condition: service_healthy
+  app-db:
+    image: postgres:17-alpine
+    container_name: app-db
+    hostname: app-db
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: metabase
+      POSTGRES_DB: metabase
+      POSTGRES_PASSWORD: mysecretpassword
+    networks: 
+      - metanet
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1024M
+        reservations:
+          cpus: '1'
+          memory: 1024M
+    command: -c log_statement=all
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U metabase -d metabase"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   setup:
     build: setup/.
     container_name: setup
@@ -118,7 +152,6 @@ services:
     hostname: frontend
     environment:
       VITE_METABASE_INSTANCE_URL: http://localhost:3000
-      VITE_AUTH_PROVIDER_URI: http://localhost:9090/api/sdk
     depends_on:
       backend:
         condition: service_healthy

@@ -57,12 +57,8 @@ if health() == 'healthy' and database.drivername in supported_dbs:
             'first_name':'a',
             'last_name':'b',
             'email':'a@b.com',
-            'site_name':'metabot1',
             'password':'metabot1',
-            'password_confirm':'metabot1'
         },
-        'database':None,
-        'invite':None,
         'prefs':{
             'site_name':'metabot1',
             'site_locale':'en',
