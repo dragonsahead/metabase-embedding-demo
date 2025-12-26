@@ -1,6 +1,7 @@
 import React from 'react';
 
 const Questions = () => {
+  const backend = import.meta.env.VITE_BACKEND_URL;
   return (
     <div>
       <p>
@@ -14,7 +15,7 @@ const Questions = () => {
       </p>
       <br></br>
       <iframe 
-        src="http://localhost:9090/api/auth?return_to=http://localhost:3000/question/new"
+        src={`${backend}/api/auth?return_to=http://localhost:3000/question/new`}
         className="w-full h-[calc(100vh-12rem)] rounded-lg"
         title="Questions Section"
       />

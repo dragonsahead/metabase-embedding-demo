@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, BarChart2, PieChart, AreaChart, ChartBarStacked, ChartCandlestick, ChartColumnStacked, ChartGantt, ChartLine, ChartNetwork } from 'lucide-react';
+import { Home, BarChart2, PieChart, AreaChart, ChartBarStacked, ChartCandlestick, ChartColumnStacked, ChartGantt, ChartLine, ChartNetwork, Code } from 'lucide-react';
 
 const Layout = ({ children }) => {
   const navigate = useNavigate();
@@ -76,6 +76,11 @@ const Layout = ({ children }) => {
             <NavLink path="/sdk_query_builder">
               <ChartNetwork size={20} />
               <span>SDK query builder</span>
+            </NavLink>
+
+            <NavLink path="/embedded_analytics_js">
+              <Code size={20} />
+              <span>Embedded Analytics JS</span>
             </NavLink>
           </div>
         </div>

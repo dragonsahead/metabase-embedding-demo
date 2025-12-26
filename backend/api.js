@@ -19,6 +19,28 @@ const signStaticEmbeddedResource = (resource, resource_id) => {
     );
 };
 
+const fakeUser = {
+    email: "someone@somedomain.com",
+    first_name: "Someone",
+    last_name: "Somebody",
+    exp: Math.floor(Date.now() / 1000) + 60 * 60, // this is the expiration time for the token, in this case, it's 1 hour
+    groups: ["viewer"], // groups property is optional, we're sending this to show how you can configure group mappings in Metabase
+};
+
+const signUserForSSO = (user) => {
+    return jwt.sign(
+        {
+            email: user.email,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            exp: user.exp,
+            groups: user.groups,
+        },
+        JWT_SIGNING_KEY_INTERACTIVE_EMBEDDING
+    );
+}
+
+
 const server = Bun.serve({
     port: 9090,
     async fetch(req) {
@@ -42,38 +64,14 @@ const server = Bun.serve({
                         params: {}
                     })
                     , 301);
+            case '/api/sso/metabase': // this is the endpoint for Embedded Analytics JS SSO
+                return Response.json({ jwt: signUserForSSO(fakeUser) });
             case '/api/auth': // this is the endpoint that the frontend will call to get the SSO URL
                 const isSdkRequest = params.get('response') === 'json';
 
-                const user = {
-                    email: "someone@somedomain.com",
-                    first_name: "Someone",
-                    last_name: "Somebody",
-                    exp: Math.floor(Date.now() / 1000) + 60 * 60, // this is the expiration time for the token, in this case, it's 1 hour
-                    groups: ["viewer"], // groups property is optional, we're sending this to show how you can configure group mappings in Metabase
-                };
-
-                const token = jwt.sign(
-                    {
-                        email: user.email,
-                        first_name: user.first_name,
-                        last_name: user.last_name,
-                        exp: user.exp,
-                        groups: user.groups,
-                    },
-                    JWT_SIGNING_KEY_INTERACTIVE_EMBEDDING
-                );
-
                 if (isSdkRequest) {
                     // if the request is coming from the SDK, we return the token directly
-                    return Response.json({ jwt: token },
-                        {
-                            headers: {
-                                'Access-Control-Allow-Origin': 'http://localhost:8080',
-                                'Access-Control-Allow-Credentials': 'true',
-                                'Access-Control-Allow-Methods': 'GET'
-                            }
-                        });
+                    return Response.json({ jwt: signUserForSSO(user) });
                 } else {
                     // if the request is not coming from the SDK, we redirect to the Metabase SSO URL with the token
                     // the return_to parameter is optional, but it's useful to redirect the user back to the frontend after the SSO login
@@ -81,7 +79,7 @@ const server = Bun.serve({
                         url.format({
                             pathname: `${METABASE_URL}/auth/sso`,
                             query: {
-                                jwt: token,
+                                jwt: signUserForSSO(fakeUser),
                                 return_to: params.get('return_to'),
                                 // you can also include more parameters to customize the features you want to expose: https://www.metabase.com/docs/latest/embedding/interactive-embedding#showing-or-hiding-metabase-ui-components
                             },

@@ -10,6 +10,7 @@ import SDKStaticQuestion from './pages/SDKStaticQuestion';
 import SDKInteractiveQuestion from './pages/SDKInteractiveQuestion';
 import SDKInteractiveDashboard from './pages/SDKInteractiveDashboard';
 import SDKStaticDashboard from './pages/SDKStaticDashboard';
+import EmbeddedAnalyticsJS from './pages/EmbeddedAnalyticsJS';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path="/sdk_static_question" element={<SDKStaticQuestion />} />
           <Route path="/interactive_question_builder" element={<InteractiveQueryBuilder />} />
           <Route path="/sdk_query_builder" element={<SDKQueryBuilder />} />
+          <Route path="/embedded_analytics_js" element={<EmbeddedAnalyticsJS />} />
         </Routes>
       </Layout>
     </Router>

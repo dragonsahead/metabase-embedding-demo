@@ -34,6 +34,5 @@ You can run all these components isolated and locally on your computer but we re
 
 ## To do
 
-- Add single questions embedding?
 - Add more styling to the SDK embedding
 - Add more customizations to the static and interactive embedding

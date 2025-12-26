@@ -11,6 +11,7 @@ databaseEndpoint = f'{host}:{port}/api/database'
 loginEndpoint = f'{host}:{port}/api/session'
 groupEndpoint = f'{host}:{port}/api/permissions/group'
 permissionsGraphEndpoint = f'{host}:{port}/api/permissions/graph'
+settingsEndpoint = f'{host}:{port}/api/settings'
 connection_string = os.environ.get('connection_string') if os.environ.get('connection_string') else 'postgres://metabase:metabase@postgres-data1:5432/sample'
 
 database = make_url(connection_string)
@@ -65,6 +66,8 @@ if health() == 'healthy' and database.drivername in supported_dbs:
             'allow_tracking':False
         }
     }
+    embedJsPayload = {"enable-embedding-simple":True,"show-simple-embed-terms":False}   
+
     try:
         sessionToken = session.post(setupEndpoint, verify=False, json=setupPayload).json()['id']
 
@@ -94,6 +97,7 @@ if health() == 'healthy' and database.drivername in supported_dbs:
         session.delete(f'{databaseEndpoint}/1')
         session.post(f'{groupEndpoint}', verify=False, json={"name":"viewer"})
         session.put(f'{permissionsGraphEndpoint}', verify=False, json={"groups":{"1":{"1":{"create-queries":"no","download":{"schemas":"full"},"view-data":"blocked"}},"3":{"1":{"view-data":"unrestricted","download":{"schemas":"full"},"create-queries":"query-builder"}}},"revision":0,"sandboxes":[],"impersonations":[]})
+        session.put(f'{settingsEndpoint}', verify=False, json=embedJsPayload)
 
         myDatabase = session.post(databaseEndpoint, verify=False, json=db)
         myDatabase = myDatabase.json()['id']

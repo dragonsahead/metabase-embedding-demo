@@ -1,16 +1,16 @@
 services:
   metabase:
-    image: metabase/metabase-enterprise:v1.55.4
+    image: metabase/metabase-enterprise:v1.57.6
     container_name: metabase
     hostname: metabase
     ports:
       - 3000:3000
     environment:
-      MB_EMBEDDING_APP_ORIGIN: "*"
+      MB_EMBEDDING_APP_ORIGIN: http://localhost:8080
       MB_ENABLE_EMBEDDING: true
       MB_EMBEDDING_SECRET_KEY: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      MB_SITE_URL: http://localhost:3000/
-      MB_PREMIUM_EMBEDDING_TOKEN: <your-token>
+      MB_SITE_URL: http://localhost:3000
+      MB_PREMIUM_EMBEDDING_TOKEN: <your_token_here>
       MB_LOAD_ANALYTICS_CONTENT: false
       MB_LOAD_SAMPLE_CONTENT: false
       MB_JWT_ENABLED: true
@@ -32,8 +32,6 @@ services:
         reservations:
           cpus: '1'
           memory: 2048M
-    networks: 
-      - metanet
     healthcheck:
       test: curl --fail -X GET -I http://localhost:3000/api/health || exit 1
       interval: 15s
@@ -43,7 +41,7 @@ services:
       postgres-data1:
         condition: service_healthy
   app-db:
-    image: postgres:17-alpine
+    image: postgres:18-alpine
     container_name: app-db
     hostname: app-db
     ports:
@@ -52,8 +50,6 @@ services:
       POSTGRES_USER: metabase
       POSTGRES_DB: metabase
       POSTGRES_PASSWORD: mysecretpassword
-    networks: 
-      - metanet
     deploy:
       resources:
         limits:
@@ -73,8 +69,6 @@ services:
     container_name: setup
     volumes:
       - $PWD/setup/setup.py:/app/setup.py
-    networks:
-      - metanet
     depends_on:
       metabase:
         condition: service_healthy
@@ -96,8 +90,6 @@ services:
     image:  metabase/qa-databases:postgres-sample-12
     container_name: postgres-data1
     hostname: postgres-data1
-    networks: 
-      - metanet
     deploy:
       resources:
         limits:
@@ -115,19 +107,17 @@ services:
   backend:
     build: backend/.
     container_name: backend
-    networks: 
-      - metanet
-    ports:
-      - 9090:9090
     hostname: backend
     volumes:
       - $PWD/backend:/app
+    ports:
+      - 9090:9090
     environment:
       METABASE_URL: http://localhost:3000
       JWT_SIGNING_KEY_STATIC_EMBEDDING: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
       JWT_SIGNING_KEY_INTERACTIVE_EMBEDDING: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
     healthcheck:
-      test: bun -e 'fetch(`http://localhost:9090/api/health`).then(x=>x.status==200?process.exit(0):process.exit(1)).catch(()=>process.exit(1))'
+      test: bun -e 'fetch("http://localhost:9090/api/health").then(x=>x.status==200?process.exit(0):process.exit(1)).catch(()=>process.exit(1))'
       interval: 15s
       timeout: 5s
       retries: 10
@@ -142,16 +132,15 @@ services:
   frontend:
     build: frontend/.
     container_name: frontend
-    networks: 
-      - metanet
-    ports:
-      - 8080:8080
+    hostname: frontend
     volumes:
       - $PWD/frontend/src:/app/src
       - $PWD/frontend/public:/app/public
-    hostname: frontend
     environment:
       VITE_METABASE_INSTANCE_URL: http://localhost:3000
+      VITE_BACKEND_URL: http://localhost:9090
+    ports:
+      - 8080:8080
     depends_on:
       backend:
         condition: service_healthy
@@ -165,7 +154,3 @@ services:
         reservations:
           cpus: '1'
           memory: 1024MB
-
-networks: 
-  metanet:
-    driver: bridge
